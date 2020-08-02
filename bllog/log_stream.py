@@ -1,11 +1,21 @@
 # Output stream for logger
 
 import abc
+import os
+import sys
 
+import bllog
+from bllog import LogFormatter
 from bllog.logger import LogMessage
 
 
 class LogStream(abc.ABC):
+
+    def __init__(self):
+        self.formatter = bllog.get_default_formatter()
+
+    def set_formatter(self, fmt: LogFormatter):
+        self.formatter = fmt
 
     @abc.abstractmethod
     def init(self):
@@ -33,4 +43,7 @@ class ConsoleStream(LogStream):
         pass
 
     def write_log(self, msg: LogMessage):
-        pass
+        p_message = self.formatter.format(msg)
+        sys.stdout.write(p_message)
+        sys.stdout.write(os.linesep)
+        sys.stdout.flush()
