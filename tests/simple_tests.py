@@ -43,6 +43,14 @@ class FormatTests(unittest.TestCase):
         logger.log(LogMessage('Test Warning', LogLevel.WARNING, 112233,datetime.datetime.now()))
         logger.log(LogMessage('Test Error', LogLevel.ERROR, 112233,datetime.datetime.now()))
         logger.log(LogMessage('Test Fatal', LogLevel.FATAL, 112233,datetime.datetime.now()))
+
+        logger.trace("Trace Test")
+        logger.debug("Debug Test")
+        logger.info("Info Test")
+        logger.warning("Warning Test")
+        logger.error("Error Test")
+        logger.fatal("Fatal Test")
+
         print('Random Print')
         sys.stderr.write('Random stderr')
         self.assertTrue(True)
