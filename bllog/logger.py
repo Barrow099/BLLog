@@ -1,5 +1,8 @@
 # The main logger implementation
-from bllog.log_classes import LogMessage
+import threading
+from datetime import datetime
+
+from bllog.log_classes import LogMessage, LogLevel
 from bllog.stream import LogStream
 
 
@@ -22,7 +25,7 @@ class Logger:
         msg.name = self.name
         for stream in self.streams:
             stream: LogStream = stream
-            stream.write_log(msg)
+            stream.log(msg)
 
     def close(self):
         for s in self.streams:
@@ -32,6 +35,27 @@ class Logger:
     def __del__(self):
         self.close()
 
+    def make_log(self, lvl: LogLevel, msg: str):
+        lm = LogMessage(msg, lvl, threading.get_ident(), datetime.now())
+        self.log(lm)
+
+    def trace(self, msg: str):
+        self.make_log(LogLevel.TRACE, msg)
+
+    def debug(self, msg: str):
+        self.make_log(LogLevel.DEBUG, msg)
+
+    def info(self, msg: str):
+        self.make_log(LogLevel.INFO, msg)
+
+    def warning(self, msg: str):
+        self.make_log(LogLevel.WARNING, msg)
+
+    def error(self, msg: str):
+        self.make_log(LogLevel.ERROR, msg)
+
+    def fatal(self, msg: str):
+        self.make_log(LogLevel.FATAL, msg)
 
 class LoggerFactory:
 

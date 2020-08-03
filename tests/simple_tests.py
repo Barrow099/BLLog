@@ -1,3 +1,4 @@
+import sys
 import unittest
 import datetime
 
@@ -32,10 +33,18 @@ class FormatTests(unittest.TestCase):
         self.assertEqual('2020-01-01 12:12:35.112233  [WARNING]: test message', formatter4.format(test_message))
 
     def test_manual_log(self):
-        cstream = bllog.StreamBuilder().console().color_line().build()
-        logger = bllog.LoggerBuilder().name('Test Log').streams([cstream]).build()
+        cstream = bllog.StreamBuilder().console().format_level_color().format_symbol_color().build()
+        fstream = bllog.StreamBuilder().named_file('test_log.log').build()
+        logger = bllog.LoggerBuilder().name('Test Log').streams([cstream,fstream]).build()
 
-        logger.log(LogMessage('Test Message', LogLevel.DEBUG, 112233,datetime.datetime.now()))
+        logger.log(LogMessage('Test Trace', LogLevel.TRACE, 112233,datetime.datetime.now()))
+        logger.log(LogMessage('Test Debug', LogLevel.DEBUG, 112233,datetime.datetime.now()))
+        logger.log(LogMessage('Test Info', LogLevel.INFO, 112233,datetime.datetime.now()))
+        logger.log(LogMessage('Test Warning', LogLevel.WARNING, 112233,datetime.datetime.now()))
+        logger.log(LogMessage('Test Error', LogLevel.ERROR, 112233,datetime.datetime.now()))
+        logger.log(LogMessage('Test Fatal', LogLevel.FATAL, 112233,datetime.datetime.now()))
+        print('Random Print')
+        sys.stderr.write('Random stderr')
         self.assertTrue(True)
 
 
