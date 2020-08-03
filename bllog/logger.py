@@ -1,29 +1,64 @@
 # The main logger implementation
-from enum import Enum
+from bllog.log_classes import LogMessage
+from bllog.stream import LogStream
 
 
-class LogLevel(Enum):
-    TRACE = 1
-    DEBUG = 2
-    INFO = 3
-    WARNING = 4
-    ERROR = 5
-    FATAL = 6
 
-class LogMessage():
-    """A log message to be written to the streams"""
+class Logger:
 
-    # TODO Do actual init
+    def __init__(self, name: str = ''):
+        self.streams = []
+        self.name = name
+        self.closed = False
+
+    def add_stream(self, stream: LogStream):
+        self.streams.append(stream)
+        stream.open()
+
+    def log(self, msg: LogMessage):
+        if self.closed:
+            raise IOError('Logger already closed')
+
+        msg.name = self.name
+        for stream in self.streams:
+            stream: LogStream = stream
+            stream.write_log(msg)
+
+    def close(self):
+        for s in self.streams:
+            s.close()
+        self.closed = True
+
+    def __del__(self):
+        self.close()
+
+
+class LoggerFactory:
+
     def __init__(self):
-        self.date_time = ""
-        self.thread_id = 0
-        self.name = ""
-        self.level = LogLevel.INFO
-        self.message = ""
-        self.ex = None
+        self.streams = []
 
-    pass
+    def get_logger(self, name: str):
+        lg = LoggerBuilder().name(name).streams(self.streams).build()
 
 
-class Logger():
-    pass
+class LoggerBuilder:
+
+    def __init__(self):
+        self.m_streams = []
+        self.m_name = ''
+
+    def streams(self, streams):
+        for s in streams:
+            self.m_streams.append(s)
+        return self
+
+    def name(self, name: str):
+        self.m_name = name
+        return self
+
+    def build(self) -> Logger:
+        log = Logger(self.m_name)
+        log.streams = self.m_streams
+
+        return log
